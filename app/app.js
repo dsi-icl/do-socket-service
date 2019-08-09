@@ -18,8 +18,8 @@ app.get('/', function(req, res, next) {
 });
 
 
-var dsistatic = io.of('/dsistatic');
-dsistatic.on('connection', function(client) { 
+var socket = io.of('/dsistatic');
+socket.on('connection', function(client) {
     var clientIP = client.request.connection.remoteAddress;
     console.log('Client '+ clientIP +' connected...');
 

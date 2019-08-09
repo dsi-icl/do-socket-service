@@ -19,7 +19,7 @@
         var b2 = document.getElementById('block2');
         var b3 = document.getElementById('block3');
 
-        var socket = io('localhost:8080/dsistatic', {path: '/socket.io'});
+        var socket = io('localhost:8080/sharedsocket', {path: '/socket.io'});
         
     	b1.onclick = function() {
 			socket.emit('messages', {app:"bitcoin", message:"block1"});
