@@ -5,14 +5,11 @@ services:
   - docker
 
 stages:
-  - build
   - name: deploy
     if: branch = master AND type != pull_request
 
 jobs:
   include:
-    - stage: build
-      script: ./build.sh
     - stage: deploy
       script:
         - echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
