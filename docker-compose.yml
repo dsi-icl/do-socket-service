@@ -1,7 +1,7 @@
 version: '3'
 services:
   gdo-socket-service:
-    image: datascience/gdo-socket-service:${SERVICE_VERSION}
+    image: datascienceinstitute/gdo-socket-service:${SERVICE_VERSION}
     build:
       context: .
       dockerfile: ./Dockerfile
