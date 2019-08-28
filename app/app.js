@@ -1,4 +1,3 @@
-
 var express = require('express');
 var app = express();
 
@@ -11,14 +10,20 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var fs = require('fs');
 
+const path = require('path');
 
 
 app.get('/', function(req, res, next) {
-	res.sendFile(__dirname + '/about.html');
+	res.sendFile(path.join(__dirname, '/about.html'));
+});
+
+app.get('/socket.io.js', function(req, res, next) {
+	res.sendFile(path.join(__dirname, 'node_modules', 'socket.io-client', 'dist', 'socket.io.js') );
 });
 
 
-var socket = io.of('/dsistatic');
+
+var socket = io.of('/sharedsocket');
 socket.on('connection', function(client) {
     var clientIP = client.request.connection.remoteAddress;
     console.log('Client '+ clientIP +' connected...');
