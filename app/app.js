@@ -18,7 +18,7 @@ app.get('/', function(req, res, next) {
 });
 
 
-var socket = io.of('/dsistatic');
+var socket = io.of('/sharedsocket');
 socket.on('connection', function(client) {
     var clientIP = client.request.connection.remoteAddress;
     console.log('Client '+ clientIP +' connected...');
