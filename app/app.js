@@ -22,7 +22,6 @@ app.get('/socket.io.js', function(req, res, next) {
 });
 
 
-
 var socket = io.of('/sharedsocket');
 socket.on('connection', function(client) {
     var clientIP = client.request.connection.remoteAddress;

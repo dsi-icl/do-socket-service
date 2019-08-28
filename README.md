@@ -11,7 +11,7 @@ The dockerfile and supervisord.conf file are based on [voduytuan/docker-socketio
 First start a Docker container:
 
 ```
-docker run -it -d --restart=always --name mysocketio -p 8080:8080 dsi-icl/socketservice
+docker run -it -d --restart=always --name mysocketio -p 8080:8080 datascienceinstitute/gdo-socket-service:latest-unstable
 ```
 
 Then use the socket as in the example file `example.html`.
