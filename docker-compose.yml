@@ -1,6 +1,6 @@
 version: '3'
 services:
-  gdo-socket-service:
+  do-socket-service:
     image: datascienceinstitute/do-socket-service:${SERVICE_VERSION}
     build:
       context: .
