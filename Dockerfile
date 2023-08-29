@@ -1,22 +1,17 @@
-FROM node:carbon-alpine
-MAINTAINER James Scott-Brown <j.scott-brown@imperial.ac.uk>
+FROM node:hydrogen-alpine
+MAINTAINER Brython Caley-Davies <bc2918@ic.ac.uk>
 
-RUN apk add --update \
-    supervisor \
-  && rm -rf /var/cache/apk/*
+RUN apk add --update && rm -rf /var/cache/apk/*
 
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+WORKDIR /usr/src/app
 
-COPY app /app
-
-RUN /bin/mkdir -p /app/logs
-
-WORKDIR /app
+COPY package.json package-lock.json ./
 
 RUN npm install --silent
-RUN npm dedupe
+
+COPY dist/app.js ./
+COPY public/ ./public/
 
 EXPOSE 8080
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
-
+CMD ["npm", "run", "start"]

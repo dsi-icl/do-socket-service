@@ -1,9 +1,14 @@
 version: '3'
 services:
   gdo-socket-service:
-    image: datascienceinstitute/gdo-socket-service:${SERVICE_VERSION}
+    image: datascienceinstitute/do-socket-service:${SERVICE_VERSION}
     build:
       context: .
       dockerfile: ./Dockerfile
     ports:
       - "8080:8080"
+    restart: "on-failure"
+    volumes:
+      - ./.env.production:/usr/src/app/.env:ro
+      - ./cors.config.json:/usr/src/app/cors.config.json:ro
+      - ./credentials.json:/usr/src/app/credentials.json:ro
