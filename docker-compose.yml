@@ -10,5 +10,5 @@ services:
     restart: "on-failure"
     volumes:
       - ./.env.production:/usr/src/app/.env:ro
-      - ./cors.config.json:/usr/src/app/cors.config.json:ro
+      - ./config.json:/usr/src/app/config.json:ro
       - ./credentials.json:/usr/src/app/credentials.json:ro

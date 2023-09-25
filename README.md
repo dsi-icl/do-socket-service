@@ -35,6 +35,6 @@ removal in the next release.
 An admin UI for monitoring the socket server and its connections is available at the ```/admin``` endpoint, for further
 information please see the documentation provided by [socket.io](https://socket.io/docs/v4/admin-ui/).
 
-Please see the [.env.example](.env.example), [cors.config.example.json](cors.config.example.json)
+Please see the [.env.example](.env.example), [config.example.json](config.example.json)
 and [credentials.example.json](credentials.example.json) files, which provide sample setups for injecting environment
 variables, cors configuration and authenticating users respectively.

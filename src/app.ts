@@ -13,7 +13,7 @@ type User = {
 }
 
 dotenv.config();
-const corsConfig = JSON.parse(readFileSync("cors.config.json").toString());
+const config = JSON.parse(readFileSync("config.json").toString());
 const credentials: User[] = JSON.parse(readFileSync("credentials.json").toString());
 
 const configureNamespace = (namespace: Namespace, authenticate: boolean = true) => {
@@ -48,7 +48,7 @@ const configureNamespace = (namespace: Namespace, authenticate: boolean = true) 
 
 const app = express();
 
-app.use(cors(corsConfig));
+app.use(cors(config["cors"] ?? {origin :"*"}));
 app.use(express.static("public"));
 app.use("/admin", express.static(path.join("node_modules", "@socket.io", "admin-ui", "ui", "dist")));
 
@@ -58,7 +58,7 @@ app.get("/socket.io.js", (_req, res) => {
 });
 
 const server = app.listen(parseInt(process.env.PORT ?? "8080"), process.env.HOST ?? "127.0.0.1", () => console.log("Server initialised!"));
-const io = new Server(server, {cors: corsConfig} as Partial<ServerOptions>);
+const io = new Server(server, config as Partial<ServerOptions>);
 
 io.of("/").use((_socket, next) => {
   next(new Error("UNAUTHORIZED"));

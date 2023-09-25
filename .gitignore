@@ -198,7 +198,7 @@ web_modules/
 .env.production
 
 # misc environment variable files
-cors.config.json
+config.json
 credentials.json
 
 # parcel-bundler cache (https://parceljs.org/)
