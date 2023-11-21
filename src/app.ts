@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import * as path from "path";
 import express from "express";
 import {readFileSync} from "fs";
+import {fileURLToPath} from 'url';
 import {instrument} from "@socket.io/admin-ui";
 import {Namespace, Server, ServerOptions} from "socket.io";
 
@@ -11,6 +12,9 @@ type User = {
   username: string
   password: string // hashed + salted
 }
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 dotenv.config();
 const config = JSON.parse(readFileSync("config.json").toString());
@@ -48,13 +52,17 @@ const configureNamespace = (namespace: Namespace, authenticate: boolean = true) 
 
 const app = express();
 
-app.use(cors(config["cors"] ?? {origin :"*"}));
+app.use(cors(config["cors"] ?? {origin: "*"}));
 app.use(express.static("public"));
 app.use("/admin", express.static(path.join("node_modules", "@socket.io", "admin-ui", "ui", "dist")));
 
 app.get("/socket.io.js", (_req, res) => {
   res.setHeader("Content-Type", mime.lookup('.js'));
-  res.sendFile(path.join(__dirname, "node_modules", "socket.io-client", "dist", "socket.io.js"));
+  if (process.env.NODE_ENVIRONMENT === "production") {
+    res.sendFile(path.join(__dirname, "..", "node_modules", "socket.io-client", "dist", "socket.io.js"));
+  } else {
+    res.sendFile(path.join(__dirname, "socket.io.js"));
+  }
 });
 
 const server = app.listen(parseInt(process.env.PORT ?? "8080"), process.env.HOST ?? "127.0.0.1", () => console.log("Server initialised!"));
@@ -64,7 +72,11 @@ io.of("/").use((_socket, next) => {
   next(new Error("UNAUTHORIZED"));
 });
 
-const auth = !process.env.USERNAME || !process.env.PASSWORD ? false : {type: "basic" as const, username: process.env.USERNAME, password: process.env.PASSWORD};
+const auth = !process.env.USERNAME || !process.env.PASSWORD ? false : {
+  type: "basic" as const,
+  username: process.env.USERNAME,
+  password: process.env.PASSWORD
+};
 instrument(io, {auth, mode: process.env.NODE_ENV === "production" ? "production" : "development"});
 
 const defaultNamespace = io.of("/sharedsocket");

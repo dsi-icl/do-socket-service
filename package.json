@@ -1,6 +1,6 @@
 {
   "name": "do-socket-service",
-  "version": "2.0.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "Socket service for the Data Observatory. Supports dynamic namespaces and broadcasts every message to all clients. Provides an admin UI for monitoring service status.",
   "scripts": {
