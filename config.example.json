@@ -1,5 +1,8 @@
 {
   "cors": {
-    "origin": "*"
-  }
+    "origin": ["domain.one", "domain.two"],
+    "credentials": true
+  },
+  "maxHttpBufferSize": 1e6,
+  "path": "/"
 }

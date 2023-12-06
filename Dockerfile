@@ -9,7 +9,7 @@ COPY package.json package-lock.json ./
 
 RUN npm install --silent
 
-COPY dist/app.js ./
+COPY index.js ./
 COPY public/ ./public/
 COPY node_modules/socket.io-client/dist/socket.io.js ./
 

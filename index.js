@@ -1,26 +1,52 @@
+/**
+ * @typedef {{
+ *   username: string
+ *   password: string // - hashed + salted
+ * }} User
+ *
+ * @typedef {{
+ *  __count__: (size: number) => void
+ *  __disconnect__: (args: {id: string}) => void
+ *  __connect__: () => void
+ * }} ServerToClientEvents
+ *
+ * @typedef {{
+ *   type?: "controller" | "view"
+ * }} SocketData
+ */
+
 import cors from "cors";
 import mime from "mime";
 import dotenv from "dotenv";
 import * as path from "path";
 import express from "express";
 import {readFileSync} from "fs";
-import {fileURLToPath} from 'url';
+import {Server} from "socket.io";
+import {fileURLToPath} from "url";
 import {instrument} from "@socket.io/admin-ui";
-import {Namespace, Server, ServerOptions} from "socket.io";
-
-type User = {
-  username: string
-  password: string // hashed + salted
-}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+/** @type {(sockets: Map<string, import("socket.io").Socket<any, any, any, SocketData>>) => number} */
+const getViewCount = sockets => {
+  let count = 0;
+
+  for (let [_k, v] of sockets) {
+    if (v.data.type !== "view") continue
+    count += 1;
+  }
+
+  return count;
+};
+
 dotenv.config();
 const config = JSON.parse(readFileSync("config.json").toString());
-const credentials: User[] = JSON.parse(readFileSync("credentials.json").toString());
+/** @type {User[]} */
+const credentials = JSON.parse(readFileSync("credentials.json").toString());
 
-const configureNamespace = (namespace: Namespace, authenticate: boolean = true) => {
+/** @type {(namespace: import("socket.io").Namespace<{}, ServerToClientEvents, {}, SocketData>, authenticate: boolean) => void} */
+const configureNamespace = (namespace, authenticate = true) => {
   namespace.use((socket, next) => {
     if (!authenticate) {
       next();
@@ -36,16 +62,24 @@ const configureNamespace = (namespace: Namespace, authenticate: boolean = true) 
       next();
     }
   });
+
   namespace.on("connection", client => {
-    const clientIP = client.handshake.address;
-    console.log(`Client ${clientIP} connected via namespace ${namespace.name}`);
+    console.log(`Client ${client.id} with type ${client.data.type ?? "default"} connected via namespace ${client.nsp.name} from ${client.handshake.address}`);
+
+    if (client.data.type === "view") {
+      namespace.emit(/** @type {"__connect__"} */ "__connect__");
+    }
 
     client.onAny((eventName, ...args) => {
+      if (eventName === "__count__" && client.data.type === "controller") {
+        client.emit(/** @type {"__count__"} */ "__count__", getViewCount(namespace.sockets));
+      }
       namespace.emit(eventName, ...args);
     });
 
     client.on("disconnect", () => {
-      namespace.emit("socket-disconnect", {id: client.id});
+      if (client.data.type === "controller") return;
+      namespace.emit(/** @type {"__disconnect__"} */"__disconnect__", {id: client.id});
     });
   });
 };
@@ -65,15 +99,15 @@ app.get("/socket.io.js", (_req, res) => {
   }
 });
 
-const server = app.listen(parseInt(process.env.PORT ?? "8080"), process.env.HOST ?? "127.0.0.1", () => console.log("Server initialised!"));
-const io = new Server(server, config as Partial<ServerOptions>);
+const server = app.listen(parseInt(process.env.PORT ?? "8080"), process.env.HOST ?? "127.0.0.1", () => console.log(`Listening on ${process.env.HOST}:${process.env.PORT}`));
+const io = new Server(server, /** @type {import("socket.io").Partial<import("socket.io").ServerOptions>} */ config);
 
 io.of("/").use((_socket, next) => {
   next(new Error("UNAUTHORIZED"));
 });
 
 const auth = !process.env.USERNAME || !process.env.PASSWORD ? false : {
-  type: "basic" as const,
+  type: /** @type {"basic"} */ "basic",
   username: process.env.USERNAME,
   password: process.env.PASSWORD
 };
