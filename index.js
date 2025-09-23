@@ -91,7 +91,7 @@ app.use(express.static("public"));
 app.use("/admin", express.static(path.join("node_modules", "@socket.io", "admin-ui", "ui", "dist")));
 
 app.get("/socket.io.js", (_req, res) => {
-  res.setHeader("Content-Type", mime.lookup('.js'));
+  res.setHeader("Content-Type", mime.getType('.js'));
   if (process.env.NODE_ENVIRONMENT === "production") {
     res.sendFile(path.join(__dirname, "..", "node_modules", "socket.io-client", "dist", "socket.io.js"));
   } else {
