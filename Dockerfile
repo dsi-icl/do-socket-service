@@ -11,7 +11,7 @@ RUN npm install --silent
 
 COPY index.js ./
 COPY public/ ./public/
-COPY node_modules/socket.io-client/dist/socket.io.js ./
+RUN cp node_modules/socket.io-client/dist/socket.io.js ./
 
 EXPOSE 8080
 
